@@ -1,0 +1,449 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "API för Swing notes",
+    "title": "Swing notes API",
+    "version": "1.0.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Note": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "description": "Ogiltig token"
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/notes": {
+      "get": {
+        "description": null,
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "notes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Note"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Returnerar användarens anteckningar"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "summary": "Returnerar användarens anteckningar",
+        "tags": [
+          "Notes"
+        ]
+      },
+      "post": {
+        "description": null,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Lägger till en ny anteckning"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Ogiltig titel eller text"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "summary": "Lägger till en ny anteckning",
+        "tags": [
+          "Notes"
+        ]
+      },
+      "put": {
+        "description": null,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Id är nödvändigt för att identifiera anteckningen som ska uppdateras men för titel och text är bara en nödvändig."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Uppdaterar en anteckning"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Ogiltig id, titel eller text"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "summary": "Uppdaterar en anteckning",
+        "tags": [
+          "Notes"
+        ]
+      }
+    },
+    "/api/notes/{id}": {
+      "delete": {
+        "description": null,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "note": {
+                      "$ref": "#/components/schemas/Note"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Tar bort en anteckning från databasen och returnerar den borttagna anteckningen"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Ogiltigt id"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "summary": "Tar bort en anteckning",
+        "tags": [
+          "Notes"
+        ]
+      }
+    },
+    "/api/notes/search": {
+      "get": {
+        "description": null,
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "notes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Note"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Returnerar anteckningar som hittades av sökningen"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Ogiltig titel"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "summary": "Sök efter anteckning med titel",
+        "tags": [
+          "Notes"
+        ]
+      }
+    },
+    "/api/user/signup": {
+      "post": {
+        "description": null,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Returnerar om konto skapades eller ej"
+          }
+        },
+        "summary": "Skapa ett konto",
+        "tags": [
+          "User"
+        ],
+        "security": []
+      }
+    },
+    "/api/user/login": {
+      "post": {
+        "description": null,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Returnerar om inloggningen lyckades samt en genererat JWT token kopplat till den användaren som är giltig i 30 minuter."
+          }
+        },
+        "summary": "Logga in",
+        "tags": [
+          "User"
+        ],
+        "security": []
+      }
+    },
+    "/api/user/check": {
+      "get": {
+        "description": null,
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Returnerar om token är giltig eller ej"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "summary": "Kontrollera om en token som skickas med i header är giltig eller ej",
+        "tags": [
+          "User"
+        ]
+      }
+    }
+  }
+}

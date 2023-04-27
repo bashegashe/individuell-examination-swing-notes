@@ -1,0 +1,6 @@
+.env
+
+db/*
+!db/.placeholder 
+
+node_modules/
